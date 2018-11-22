@@ -1,0 +1,278 @@
+
+
+
+
+<html>
+    <head>
+        
+        <title>CodePlayer</title>
+        
+        <script type="text/javascript" src="jquery.min.js"></script>
+        
+        <style type="text/css">
+        
+            body {
+                
+                font-family:  sans-serif;
+                padding: 0;
+                margin: 0;
+                
+            }
+            
+            #header {
+                
+                width: 100%;
+                background-color: #EEEEEE;
+                padding: 5px;
+                height: 30px;
+                
+            }
+            
+            #logo {
+                
+                float: left;
+                font-weight: bold;
+                font-size: 130%;
+                padding: 3px 5px;
+                
+            }
+            
+            #buttonContainer {
+                
+                width: 233px;
+                margin: 0 auto;
+                
+            }
+            
+            .toggleButton {
+                
+                float: left; 
+                border: 1px solid grey;
+                padding: 6px;
+                border-right: none;
+                font-size: 90%
+                
+                
+            }
+            
+            #html {
+                
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 3px;               
+                
+            }
+            
+            #output {
+                
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+                border-right: 1px solid grey;
+                
+                
+            }
+            
+            .active {
+                
+                background-color: #E8F2FF;
+                
+            }
+            
+            .highlightedButton {
+                
+                background-color: grey;
+                
+            }
+            
+            textarea {
+                
+                width: 50%;
+                resize: none;
+                border-top: none;
+                border-color: grey;
+                
+            }
+            
+            .panel {
+                
+                float: left;
+                width: 50%;
+                border-left: none;
+            }
+            
+            iframe {
+                
+                border: none;
+                
+            }
+            
+            .hidden {
+                
+                display: none;
+                
+            }
+            
+   
+        </style>
+    
+    </head>
+
+    <body>
+        
+<!-- giving name id's and classe's, to style em on css -->
+        
+        <div id="header">
+        
+            <div id="logo">
+            
+                CodePlayer
+                
+            </div>
+            
+            <div id="buttonContainer">
+                
+<!-- the "ACTIVE" class will be used to change the color of the element when is selected, so we put active class only to HTML and OUTPUT cuz we want them to be selected from the beginning, and each of these have a textarea  -->
+            
+                <div class="toggleButton active" id="html">HTML</div>
+                
+                <div class="toggleButton" id="css">CSS</div>
+                
+                <div class="toggleButton" id="javascript">JavaScript</div>
+                
+                <div class="toggleButton active" id="output">Output</div>
+            
+            </div>
+        
+        </div>
+        
+<!-- the div named bodycontainer contains the textareas and the iframe -->
+        
+        <div id="bodyContainer">
+            
+<!-- this textarea it recieves the HTML code -->
+        
+            <textarea id="htmlPanel" class="panel"><p id="paragraph">Hello world!</p></textarea>
+            
+<!-- this text area recieves the CSS code-->
+            
+            <textarea id="cssPanel" class="panel hidden">p { color: green; }</textarea>
+            
+<!-- this textarea recieves the JAVASCRIPT code-->
+            
+            <textarea id="javascriptPanel" class="panel hidden">document.getElementById("paragraph").innerHTML = "Hello Rob!"</textarea>
+            
+<!-- the iframe outputs the code from the textareas above -->
+            
+            <iframe id="outputPanel" class="panel"></iframe>
+        
+        </div>
+    
+        <script type="text/javascript">
+            
+//
+        
+            function updateOutput() {
+                
+// The .contents() method can also be used to get the content document of an iframe, if the iframe is on the same domain as the main page.
+// "find("html")" this will find the whole html content in the iframe 
+// html() this will insert HTML code to the html document found by find("html"), we insert the html tags then we take the value of the "cssPanel" textarea we append to it then we add the closing tags for the styles and head and the opening tag for the body then we append the value of the "htmlPanel" textarea and then add the closing body and html tags
+                
+                $("iframe").contents().find("html").html("<html><head><style type='text/css'>" + $("#cssPanel").val() + "</style></head><body>" + $("#htmlPanel").val() + "</body></html>");
+                
+// this will make the javascript run in the iframe not in whole page!
+// The contentWindow property returns the Window object generated by an iframe element (through the window object, you can access the document object and then any one of the document's elements).
+// The eval() function evaluates or executes an argument.
+// If the argument is an expression, eval() evaluates the expression. If the argument is one or more JavaScript statements, eval() executes the statements.
+// the "contentWindow" takes the content of the iframe(output) window, and executes the javascript taken from the "javascriptPanel", through the "eval" function
+
+                
+                document.getElementById("outputPanel").contentWindow.eval($("#javascriptPanel").val());
+                
+            }
+            
+// this command will put hover in function 
+// The hover() method specifies two functions to run when the mouse pointer hovers over the selected elements.
+// This method triggers both the mouseenter and mouseleave events.
+// Note: If only one function is specified, it will be run for both the mouseenter and mouseleave events.
+            
+            $(".toggleButton").hover(function () {
+                
+// this will make the element grey when the mouse hovers over it
+// "this" refeers to the object in question, the button that is being hovered
+                
+                
+                $(this).addClass("highlightedButton");
+                
+            }, function() {
+                
+// this will remove the element's hovering's color when the mouse leaves the element
+                
+                $(this).removeClass("highlightedButton");
+                
+                
+            });
+            
+            $(".toggleButton").click(function() {
+                
+// toggleClass will add the class if it's not there, and remove it if it's there
+//The toggleClass() method toggles between adding and removing one or more class names from the selected elements.
+//This method checks each element for the specified class names. The class names are added if missing, and removed if already set - This creates a toggle effect.
+//However, by using the "switch" parameter, you can specify to only remove, or only add a class name.           
+                
+
+                $(this).toggleClass("active");
+                
+// this will help us to notice if the element is active or not when the we click on it
+                
+                $(this).removeClass("highlightedButton"); 
+                
+// get the id of the button that was clicked and than show and hide the button(page) that was clicked
+// the attr() gets the value of the id of the object in question/selected and adds the word "Panel" to the value of the id
+                
+                var panelId = $(this).attr("id") + "Panel";
+                
+// here we select the id through "#" and the name of the id saved in panelId variable and we apply a toggleClass function with a class ".hidden"
+                
+                $("#" + panelId).toggleClass("hidden");
+                
+// we have 2 panels with class "hidden" which the function length finds the number of the panel with the class hidden and we substract that from the total number of panels
+                
+                var numberOfActivePanels = 4 - $(".hidden").length;
+                
+//"$(window).width()" calculates the width of the whole window and then we devide by the "numberOfActivePanels" to it and then we substract -10 of padding, all this results in a number/value which the function width returns for that praticular panel 
+                
+                
+                $(".panel").width(($(window).width() / numberOfActivePanels) -10);
+                  
+                
+                
+            });
+            
+// this is for area size to be same as whole page size, or window side but we remove the header area from it!
+            
+            $(".panel").height($(window).height() - $("#header").height() -15);
+            
+            $(".panel").width(($(window).width() / 2) -10);
+            
+            
+            
+// this will take the iframe contents find html and then replace the value of html to output 
+             
+// and this also will connect the codes with each other (EX HTML WITH CSS)
+            
+            updateOutput();
+            
+// the "on" function will will call the "updateOutput" function on textarea everytime these 3 events happen 'change keyup paste'            
+            
+            $("textarea").on('change keyup paste', function() {
+                
+               updateOutput();
+                
+            });
+            
+
+        </script>
+    
+    </body>
+    
+</html>
+
